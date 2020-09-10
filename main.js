@@ -3,6 +3,7 @@ const score = document.querySelector('.game__score');
 const start = document.querySelector('.game__start-button');
 const gameArea = document.querySelector('.game__area');
 const car = document.createElement('div');
+const button = document.querySelector('.game__start-button');
 car.classList.add('car');
 
 const keys = {
@@ -26,6 +27,7 @@ function getQuantityElements(heightElement) {
 
 function startGame() {
     start.classList.add('hide');
+    gameArea.innerHTML = '';
 
     for (let i = 0; i < getQuantityElements(100); i++) {
         const line = document.createElement('div');
@@ -47,9 +49,12 @@ function startGame() {
     }
 
 
-
+    setting.score = 0;
     setting.start = true;
     gameArea.appendChild(car);
+    car.style.left = gameArea.offsetWidth / 2 - car.offsetWidth / 2;
+    car.style.top = 'auto';
+    car.style.bottom = '10px';
     setting.x = car.offsetLeft;
     setting.y = car.offsetTop;
     requestAnimationFrame(playGame);
@@ -63,6 +68,8 @@ function startRun(event) {
 function playGame() {
 
     if (setting.start) {
+        setting.score += setting.speed;
+        score.innerHTML = 'SCORE<br>' + setting.score;
         moveRoad();
         moveEnemy();
         if (keys.ArrowLeft && setting.x > 0) {
@@ -105,6 +112,19 @@ function moveRoad() {
 function moveEnemy() {
     let enemies = document.querySelectorAll('.enemy');
     enemies.forEach(function (enemy) {
+        let carRect = car.getBoundingClientRect();
+        let enemyRect = enemy.getBoundingClientRect();
+
+        if (carRect.top <= enemyRect.bottom &&
+            carRect.right >= enemyRect.left &&
+            carRect.left <= enemyRect.right &&
+            carRect.bottom >= enemyRect.top) {
+            setting.start = false;
+            button.textContent = 'Нажми, чтобы начать заново!';
+            start.classList.remove('hide');
+            start.style.top = score.offsetHeight;
+
+        }
         enemy.y += setting.speed / 2;
         enemy.style.top = enemy.y + 'px';
 
